@@ -1,0 +1,4 @@
+env: staging
+model: claude-sonnet-4-5
+max_concurrent_agents: 6
+log_level: INFO

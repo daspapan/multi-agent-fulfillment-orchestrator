@@ -1,0 +1,4 @@
+env: prod
+model: claude-sonnet-4-5
+max_concurrent_agents: 12
+log_level: WARNING
