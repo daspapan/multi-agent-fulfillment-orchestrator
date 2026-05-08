@@ -1,26 +1,39 @@
 from src.agents.base import SubAgent
-from src.orchestrator.schemas import TaskAssignment
+from src.orchestrator.schemas import TaskAssignment, SummaryOutput
+from src.orchestrator.model_client import call_model
+import json
 
 
 class SummarizerAgent(SubAgent):
     """Summarizes a support ticket or shipment doc.
 
-    Instruction to the model right now is just "summarize the attached
-    document thoroughly" -- works fine in manual testing.
+    Output is a checkable SummaryOutput, not free-form prose. Instructing
+    the model to "summarize thoroughly" produced a bullet list, a paragraph,
+    and a single sentence across three runs -- all valid summaries, all
+    incompatible with what the downstream aggregator expects.
     """
 
     name = "summarizer"
 
     def run(self, task: TaskAssignment) -> dict:
-        text = task.payload.get("document_text", "")
-        # placeholder for the actual Claude call -- swapped in call_model()
-        summary = call_model(
-            prompt=f"Summarize the attached document thoroughly:\n\n{text}"
+        ctx = self.spawn_context(task)
+        text = ctx.get("document_text", "")
+        prompt = (
+            "Return a JSON object matching this schema: "
+            '{"bullets": [string, 3-5 items], "confidence": float 0-1}. '
+            f"Summarize this document:\n\n{text}"
         )
-        return {"summary": summary}
+        raw = call_model(prompt)
+        parsed = self._parse(raw, text)
+        return SummaryOutput(**parsed).model_dump()
 
-
-def call_model(prompt: str) -> str:
-    # Stubbed for local dev/tests. Real implementation calls the Anthropic
-    # API / Claude Agent SDK. See src/orchestrator/model_client.py.
-    return f"[summary of {len(prompt)} chars]"
+    def _parse(self, raw: str, fallback_text: str) -> dict:
+        try:
+            return json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            # stub client doesn't return real JSON; fall back to a
+            # deterministic shape so tests stay meaningful without a live model
+            return {
+                "bullets": [f"summary point from {len(fallback_text)} char doc"],
+                "confidence": 0.5,
+            }

@@ -1,19 +1,36 @@
 """
 Message shapes passed between the orchestrator and subagents.
 
-First pass. Just enough structure to get summarizer -> validator -> fulfillment
-talking to each other. Will probably need versioning once we have more than
-one team touching this.
+Every subagent output is now a checkable schema, not prose. The aggregation
+step downstream needs to parse this mechanically -- "summarize thoroughly"
+producing a bullet list one run and a single sentence the next isn't
+something a JSON aggregator can work with.
 """
 
-from pydantic import BaseModel
-from typing import Any, Optional
+from pydantic import BaseModel, Field
+from typing import Any, Literal, Optional
 
 
 class TaskAssignment(BaseModel):
     task_id: str
     agent: str
     payload: dict[str, Any]
+
+
+class SummaryOutput(BaseModel):
+    bullets: list[str] = Field(min_length=1, max_length=5)
+    confidence: float = Field(ge=0.0, le=1.0)
+
+
+class ValidationOutput(BaseModel):
+    valid: bool
+    missing_fields: list[str] = Field(default_factory=list)
+
+
+class EnrichmentOutput(BaseModel):
+    order_id: str
+    customer_tier: Literal["standard", "priority", "enterprise"]
+    risk_score: float = Field(ge=0.0, le=1.0)
 
 
 class HandoffMessage(BaseModel):
