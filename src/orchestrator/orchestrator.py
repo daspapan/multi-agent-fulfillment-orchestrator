@@ -10,6 +10,7 @@ whole task graph, and the only place that makes that call.
 """
 
 import logging
+import time
 from src.agents.summarizer import SummarizerAgent
 from src.agents.validator import ValidatorAgent
 from src.agents.enrichment import EnrichmentAgent
@@ -62,6 +63,7 @@ class Orchestrator:
                 last_error = str(exc)
                 self.state.record(task_id, agent_name, "retrying", {"attempt": attempt, "error": last_error})
                 logger.warning("agent %s raised on attempt %s: %s", agent_name, attempt, last_error)
+                time.sleep(2 ** attempt)  # backoff
                 continue
 
             required = REQUIRED_FIELDS.get(agent_name, [])
