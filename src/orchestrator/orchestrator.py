@@ -84,6 +84,14 @@ class Orchestrator:
             enriched = self.dispatch(f"{task_id}-enrich", "enrichment", {"order": order})
             order = {**order, **enriched}
             result = self.dispatch(f"{task_id}-fulfill", "fulfillment", {"order": order})
+            if result.get("submitted") is False:
+                # completion check passed (all required fields present) but this
+                # is a legitimate business rejection, not a technical success
+                return {
+                    "status": "rejected",
+                    "result": result,
+                    "decision_log": self.state.decision_log(f"{task_id}-fulfill"),
+                }
             return {"status": "ok", "result": result, "decision_log": self.state.decision_log(f"{task_id}-fulfill")}
         except HandoffFailed as exc:
             logger.error("order %s failed at %s: %s", order.get("order_id"), exc.agent, exc.reason)
