@@ -2,6 +2,7 @@
 max_iterations is hit. There is no code path that runs forever."""
 
 import pytest
+
 from src.orchestrator.evaluator_optimizer import EvaluatorOptimizerLoop
 
 

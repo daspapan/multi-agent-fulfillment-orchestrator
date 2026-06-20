@@ -3,7 +3,8 @@ fields, and rejection of unknown future versions."""
 
 import pytest
 from pydantic import ValidationError
-from src.orchestrator.schemas import HandoffMessage, SummaryOutput, CURRENT_HANDOFF_VERSION
+
+from src.orchestrator.schemas import CURRENT_HANDOFF_VERSION, HandoffMessage, SummaryOutput
 
 
 def test_handoff_defaults_to_current_version():

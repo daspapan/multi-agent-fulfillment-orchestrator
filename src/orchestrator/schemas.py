@@ -8,8 +8,9 @@ New fields ship optional with a default, get a deprecation window, and
 only become mandatory once the fleet has rolled forward.
 """
 
+from typing import Any, Literal
+
 from pydantic import BaseModel, Field, field_validator
-from typing import Any, Literal, Optional
 
 CURRENT_HANDOFF_VERSION = 2
 

@@ -1,7 +1,8 @@
-from src.agents.base import SubAgent
-from src.orchestrator.schemas import TaskAssignment, SummaryOutput
-from src.orchestrator.model_client import call_model
 import json
+
+from src.agents.base import SubAgent
+from src.orchestrator.model_client import call_model
+from src.orchestrator.schemas import SummaryOutput, TaskAssignment
 
 
 class SummarizerAgent(SubAgent):
