@@ -24,7 +24,6 @@ def run_pipeline(document: dict) -> dict:
     trace = {"stage_reached": 0, "errors": []}
 
     trace["stage_reached"] = 1
-    stage1 = {"received": True, "document": document}
 
     trace["stage_reached"] = 2
     stage2 = SummarizerAgent().run(

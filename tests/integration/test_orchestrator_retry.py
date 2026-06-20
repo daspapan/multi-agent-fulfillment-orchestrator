@@ -2,10 +2,11 @@
 An agent that fails the completion check should be retried by the
 orchestrator up to MAX_RETRIES, and the decision log should show it."""
 
-from src.orchestrator.orchestrator import Orchestrator, HandoffFailed
-from src.agents.base import SubAgent
-from src.orchestrator.schemas import TaskAssignment
 import pytest
+
+from src.agents.base import SubAgent
+from src.orchestrator.orchestrator import HandoffFailed, Orchestrator
+from src.orchestrator.schemas import TaskAssignment
 
 
 class FlakyAgent(SubAgent):
@@ -25,7 +26,7 @@ def test_orchestrator_retries_before_giving_up():
     orch = Orchestrator()
     flaky = FlakyAgent()
     orch.agents["enrichment"] = flaky
-    result = orch.dispatch("t1", "enrichment", {})
+    orch.dispatch("t1", "enrichment", {})
     assert flaky.calls == 2
     log = orch.state.decision_log("t1")
     assert any(entry["status"] == "retrying" for entry in log)

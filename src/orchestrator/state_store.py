@@ -10,7 +10,6 @@ the prod deployment (see ARCHITECTURE.md).
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
 
 
 @dataclass

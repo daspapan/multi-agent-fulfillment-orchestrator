@@ -10,13 +10,14 @@ whole task graph, and the only place that makes that call.
 """
 
 import logging
-from src.agents.summarizer import SummarizerAgent
-from src.agents.validator import ValidatorAgent
+
 from src.agents.enrichment import EnrichmentAgent
 from src.agents.fulfillment import FulfillmentAgent
+from src.agents.summarizer import SummarizerAgent
+from src.agents.validator import ValidatorAgent
+from src.orchestrator.completion_check import check_completion
 from src.orchestrator.schemas import TaskAssignment
 from src.orchestrator.state_store import StateStore
-from src.orchestrator.completion_check import check_completion
 
 logger = logging.getLogger("orchestrator")
 
