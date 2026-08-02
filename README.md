@@ -38,27 +38,6 @@ amount of logging fixes that after the fact.
 
 Full reasoning on compute, storage, networking, and IAM: **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
-```
-Support ticket / shipment doc / order event
-                |
-                v
-        ORCHESTRATOR (hub)
-   owns retry/substitute/escalate, tracks task graph,
-   enforces handoff schema version on every message
-                |
-   +------------+-------------+------------------+
-   |            |             |                  |
-   v            v             v                  v
-Summarizer   Validator    Enrichment        Fulfillment
-(blank ctx)  (blank ctx)  (blank ctx)       (blank ctx)
-   |            |             |                  |
-   +------------+-------------+------------------+
-                |
-                v
-     completion check: expected fields present?
-     types/ranges valid? -> proceed, else escalate/retry
-```
-
 ![Multi-Agent Fulfillment Orchestrator - Solution Architecture](docs/Multi-Agent%20Orchestrator.png)
 
 ## Setup
