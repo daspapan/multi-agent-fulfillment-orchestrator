@@ -59,6 +59,8 @@ Summarizer   Validator    Enrichment        Fulfillment
      types/ranges valid? -> proceed, else escalate/retry
 ```
 
+![Multi-Agent Fulfillment Orchestrator - Solution Architecture](docs/Multi-Agent%20Orchestrator.png)
+
 ## Setup
 
 ```bash
