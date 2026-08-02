@@ -17,3 +17,5 @@ build/
 .vscode/
 content/
 content_hide
+course/
+course-from-scratch/
