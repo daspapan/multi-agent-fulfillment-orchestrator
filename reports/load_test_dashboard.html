@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Orchestrator load test dashboard</title>
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --border: #e3e2dd;
+    --text: #16150f; --text-secondary: #5f5e58; --text-muted: #8b8a83;
+    --blue: #2a78d6; --orange: #eb6834;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171715; --surface: #201f1c; --border: #34332e;
+      --text: #f2f1ec; --text-secondary: #c3c2b7; --text-muted: #8b8a83;
+    }
+  }
+  body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; }
+  h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; }
+  p.sub { color: var(--text-secondary); font-size: 14px; margin: 0 0 1.5rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 2rem; }
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; padding: 1rem; }
+  .card .label { font-size: 12px; color: var(--text-secondary); margin: 0 0 4px; }
+  .card .value { font-size: 22px; font-weight: 500; margin: 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .chart-wrap { position: relative; width: 100%; height: 280px; margin-bottom: 2rem; background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; padding: 1rem 1rem 0.5rem; box-sizing: border-box; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 0.5px solid var(--border); }
+  th { color: var(--text-secondary); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .note { font-size: 12px; color: var(--text-muted); margin-top: 1rem; }
+  code { font-family: ui-monospace, monospace; background: var(--border); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h1>Orchestrator load test dashboard</h1>
+  <p class="sub">Generated from 7 run(s). Re-run <code>scripts/load_test.py</code> then this script to refresh.</p>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="legend">
+    <span><span class="swatch" style="background: var(--blue, #2a78d6);"></span>0% induced failures</span>
+    <span><span class="swatch" style="background: var(--orange, #eb6834);"></span>&gt;0% induced failures</span>
+  </div>
+  <div class="chart-wrap"><canvas id="throughputChart" role="img" aria-label="Orders per second by concurrency level, split by failure rate"></canvas></div>
+  <div class="chart-wrap"><canvas id="latencyChart" role="img" aria-label="p50 and p95 latency in seconds by concurrency level, for runs with induced failures"></canvas></div>
+
+  <table id="table"></table>
+  <p class="note" id="config-note"></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const RUNS = [{"concurrency": 1, "num_orders": 300, "failure_rate": 0.0, "wall_time_s": 0.007768832991132513, "throughput_orders_per_s": 38615.838484676584, "latency_p50_s": 1.158300437964499e-05, "latency_p95_s": 1.287501072511077e-05, "latency_p99_s": 3.158298204652965e-05, "latency_max_s": 0.00011441600508987904, "total_retries": 0, "status_counts": {"ok": 300}}, {"concurrency": 3, "num_orders": 300, "failure_rate": 0.0, "wall_time_s": 0.007897832983871922, "throughput_orders_per_s": 37985.103079873516, "latency_p50_s": 1.1583993909880519e-05, "latency_p95_s": 1.6083999071270227e-05, "latency_p99_s": 3.308302257210016e-05, "latency_max_s": 0.000672166992444545, "total_retries": 0, "status_counts": {"ok": 300}}, {"concurrency": 6, "num_orders": 300, "failure_rate": 0.0, "wall_time_s": 0.00926316698314622, "throughput_orders_per_s": 32386.33186099658, "latency_p50_s": 1.2082979083061218e-05, "latency_p95_s": 1.8708000425249338e-05, "latency_p99_s": 3.5834003938362e-05, "latency_max_s": 4.545800038613379e-05, "total_retries": 0, "status_counts": {"ok": 300}}, {"concurrency": 12, "num_orders": 300, "failure_rate": 0.0, "wall_time_s": 0.009303375001763925, "throughput_orders_per_s": 32246.362201149564, "latency_p50_s": 1.1832977179437876e-05, "latency_p95_s": 2.2374995751306415e-05, "latency_p99_s": 4.0041981264948845e-05, "latency_max_s": 0.0001642499992158264, "total_retries": 0, "status_counts": {"ok": 300}}, {"concurrency": 1, "num_orders": 10, "failure_rate": 0.25, "wall_time_s": 10.028092588006984, "throughput_orders_per_s": 0.9971986110259311, "latency_p50_s": 1.0009207510011038, "latency_p95_s": 2.007798375998391, "latency_p99_s": 2.007798375998391, "latency_max_s": 2.007798375998391, "total_retries": 5, "status_counts": {"ok": 10}}, {"concurrency": 3, "num_orders": 12, "failure_rate": 0.25, "wall_time_s": 4.018002792989137, "throughput_orders_per_s": 2.9865584018354476, "latency_p50_s": 6.677149212919176e-05, "latency_p95_s": 2.0092551260022447, "latency_p99_s": 2.0092551260022447, "latency_max_s": 2.0092551260022447, "total_retries": 4, "status_counts": {"ok": 12}}, {"concurrency": 6, "num_orders": 12, "failure_rate": 0.25, "wall_time_s": 6.022172461001901, "throughput_orders_per_s": 1.9926363912207814, "latency_p50_s": 2.0101025634940015, "latency_p95_s": 6.020773127995199, "latency_p99_s": 6.020773127995199, "latency_max_s": 6.020773127995199, "total_retries": 11, "status_counts": {"ok": 12}}];
+const CONFIG = {"dev": {"env": "dev", "model": "claude-haiku-4-5", "max_concurrent_agents": 3, "log_level": "DEBUG"}, "staging": {"env": "staging", "model": "claude-sonnet-4-5", "max_concurrent_agents": 6, "log_level": "INFO"}, "prod": {"env": "prod", "model": "claude-sonnet-4-5", "max_concurrent_agents": 12, "log_level": "WARNING"}};
+
+const byConcurrency = {};
+RUNS.forEach(r => {
+  const key = r.concurrency;
+  if (!byConcurrency[key]) byConcurrency[key] = [];
+  byConcurrency[key].push(r);
+});
+const concurrencies = Object.keys(byConcurrency).map(Number).sort((a, b) => a - b);
+
+const baseline = concurrencies.map(c => {
+  const runs = byConcurrency[c].filter(r => r.failure_rate === 0);
+  return runs.length ? runs[runs.length - 1].throughput_orders_per_s : null;
+});
+const stressThroughput = concurrencies.map(c => {
+  const runs = byConcurrency[c].filter(r => r.failure_rate > 0);
+  return runs.length ? runs[runs.length - 1].throughput_orders_per_s : null;
+});
+const stressP50 = concurrencies.map(c => {
+  const runs = byConcurrency[c].filter(r => r.failure_rate > 0);
+  return runs.length ? runs[runs.length - 1].latency_p50_s : null;
+});
+const stressP95 = concurrencies.map(c => {
+  const runs = byConcurrency[c].filter(r => r.failure_rate > 0);
+  return runs.length ? runs[runs.length - 1].latency_p95_s : null;
+});
+
+const bestBaseline = Math.max(...baseline.filter(v => v !== null), 0);
+const worstStressP95 = Math.max(...stressP95.filter(v => v !== null), 0);
+const totalRetries = RUNS.reduce((sum, r) => sum + (r.total_retries || 0), 0);
+const totalOrders = RUNS.reduce((sum, r) => sum + (r.num_orders || 0), 0);
+
+document.getElementById('cards').innerHTML = `
+  <div class="card"><p class="label">Peak baseline throughput</p><p class="value">${bestBaseline.toLocaleString(undefined, {maximumFractionDigits: 0})}/s</p></div>
+  <div class="card"><p class="label">Worst p95 latency (failures on)</p><p class="value">${worstStressP95.toFixed(2)}s</p></div>
+  <div class="card"><p class="label">Total retries observed</p><p class="value">${totalRetries}</p></div>
+  <div class="card"><p class="label">Total orders processed</p><p class="value">${totalOrders}</p></div>
+`;
+
+new Chart(document.getElementById('throughputChart'), {
+  type: 'bar',
+  data: {
+    labels: concurrencies.map(c => 'c=' + c),
+    datasets: [
+      { label: '0% failures', data: baseline, backgroundColor: '#2a78d6', borderRadius: 4 },
+      { label: '>0% failures', data: stressThroughput, backgroundColor: '#eb6834', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, title: { display: true, text: 'Throughput (orders/s, log scale)' } },
+    scales: { y: { type: 'logarithmic' } }
+  }
+});
+
+new Chart(document.getElementById('latencyChart'), {
+  type: 'bar',
+  data: {
+    labels: concurrencies.map(c => 'c=' + c),
+    datasets: [
+      { label: 'p50', data: stressP50, backgroundColor: '#2a78d6', borderRadius: 4 },
+      { label: 'p95', data: stressP95, backgroundColor: '#eb6834', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, title: { display: true, text: 'Latency under induced failures (seconds)' } }
+  }
+});
+
+const rows = RUNS.map(r => `
+  <tr>
+    <td>${r.concurrency}</td>
+    <td>${r.num_orders}</td>
+    <td>${(r.failure_rate * 100).toFixed(0)}%</td>
+    <td>${r.throughput_orders_per_s.toFixed(1)}</td>
+    <td>${(r.latency_p50_s * 1000).toFixed(1)}</td>
+    <td>${(r.latency_p95_s * 1000).toFixed(1)}</td>
+    <td>${r.total_retries}</td>
+    <td>${JSON.stringify(r.status_counts)}</td>
+  </tr>
+`).join('');
+document.getElementById('table').innerHTML = `
+  <thead><tr>
+    <th>concurrency</th><th>orders</th><th>failure rate</th><th>throughput/s</th>
+    <th>p50 ms</th><th>p95 ms</th><th>retries</th><th>statuses</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+`;
+
+const configLines = Object.entries(CONFIG).map(([env, cfg]) =>
+  `${env}: max_concurrent_agents=${cfg.max_concurrent_agents}, model=${cfg.model}`
+).join(' · ');
+document.getElementById('config-note').textContent = configLines
+  ? 'Config reference -- ' + configLines
+  : '';
+</script>
+</body>
+</html>

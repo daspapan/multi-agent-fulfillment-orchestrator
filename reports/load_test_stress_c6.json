@@ -1,0 +1,19 @@
+{
+  "runs": [
+    {
+      "concurrency": 6,
+      "num_orders": 12,
+      "failure_rate": 0.25,
+      "wall_time_s": 6.022172461001901,
+      "throughput_orders_per_s": 1.9926363912207814,
+      "latency_p50_s": 2.0101025634940015,
+      "latency_p95_s": 6.020773127995199,
+      "latency_p99_s": 6.020773127995199,
+      "latency_max_s": 6.020773127995199,
+      "total_retries": 11,
+      "status_counts": {
+        "ok": 12
+      }
+    }
+  ]
+}
