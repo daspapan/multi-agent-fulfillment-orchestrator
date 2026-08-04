@@ -1,0 +1,64 @@
+{
+  "runs": [
+    {
+      "concurrency": 1,
+      "num_orders": 300,
+      "failure_rate": 0.0,
+      "wall_time_s": 0.007768832991132513,
+      "throughput_orders_per_s": 38615.838484676584,
+      "latency_p50_s": 1.158300437964499e-05,
+      "latency_p95_s": 1.287501072511077e-05,
+      "latency_p99_s": 3.158298204652965e-05,
+      "latency_max_s": 0.00011441600508987904,
+      "total_retries": 0,
+      "status_counts": {
+        "ok": 300
+      }
+    },
+    {
+      "concurrency": 3,
+      "num_orders": 300,
+      "failure_rate": 0.0,
+      "wall_time_s": 0.007897832983871922,
+      "throughput_orders_per_s": 37985.103079873516,
+      "latency_p50_s": 1.1583993909880519e-05,
+      "latency_p95_s": 1.6083999071270227e-05,
+      "latency_p99_s": 3.308302257210016e-05,
+      "latency_max_s": 0.000672166992444545,
+      "total_retries": 0,
+      "status_counts": {
+        "ok": 300
+      }
+    },
+    {
+      "concurrency": 6,
+      "num_orders": 300,
+      "failure_rate": 0.0,
+      "wall_time_s": 0.00926316698314622,
+      "throughput_orders_per_s": 32386.33186099658,
+      "latency_p50_s": 1.2082979083061218e-05,
+      "latency_p95_s": 1.8708000425249338e-05,
+      "latency_p99_s": 3.5834003938362e-05,
+      "latency_max_s": 4.545800038613379e-05,
+      "total_retries": 0,
+      "status_counts": {
+        "ok": 300
+      }
+    },
+    {
+      "concurrency": 12,
+      "num_orders": 300,
+      "failure_rate": 0.0,
+      "wall_time_s": 0.009303375001763925,
+      "throughput_orders_per_s": 32246.362201149564,
+      "latency_p50_s": 1.1832977179437876e-05,
+      "latency_p95_s": 2.2374995751306415e-05,
+      "latency_p99_s": 4.0041981264948845e-05,
+      "latency_max_s": 0.0001642499992158264,
+      "total_retries": 0,
+      "status_counts": {
+        "ok": 300
+      }
+    }
+  ]
+}
