@@ -62,11 +62,15 @@ See **[TESTING.md](TESTING.md)** for what each test validates and why.
 
 ## Deployment status
 
-`infra/template.yaml` is a complete SAM/CloudFormation template matching
-the architecture doc — VPC, ECS/Fargate, DynamoDB, S3, API Gateway,
-least-privilege IAM roles per agent. **It has not been deployed.** This
-repo ships infrastructure-as-code that's ready to run, not a live AWS
-stack. See "What's actually deployed" at the bottom of `ARCHITECTURE.md`.
+`infra-cdk/` is a complete AWS CDK (TypeScript) app matching the
+architecture doc — VPC, one ECS/Fargate service running the orchestrator,
+DynamoDB, S3, an API Gateway HTTP API with a VPC Link, one Lambda for the
+fulfillment webhook, and least-privilege IAM per resource, with its own
+jest test suite. **It has not been deployed.** This repo ships
+infrastructure-as-code that's ready to run (`cdk synth` succeeds with no
+AWS credentials required), not a live AWS stack. See "What's actually
+deployed" at the bottom of `ARCHITECTURE.md` and `infra-cdk/README.md`
+for deploy prerequisites.
 
 ## Environments
 
@@ -79,11 +83,15 @@ hardcoded in `src/`.
 - Load-test `call_model()` against real Anthropic API rate limits before
   any production traffic.
 - Move `StateStore` from in-memory to the DynamoDB-backed version in
-  `infra/template.yaml`.
+  `infra-cdk/lib/data-stack.ts`.
 - Chaos-test subagent failure mid-handoff (kill a task mid-flight), which
   is the more realistic version of the original Week-1 outage.
-- Actually provision `infra/template.yaml` in a real AWS account once a
-  team is ready to take on that cost.
+- Actually provision `infra-cdk/` in a real AWS account once a team is
+  ready to take on that cost (see `infra-cdk/README.md` for the
+  bootstrap/Docker prerequisites).
+- Split agents into separate Fargate services behind a queue, if
+  per-agent compute isolation (not just the context isolation already
+  enforced in `src/agents/base.py`) becomes a real requirement.
 
 ## Changelog
 

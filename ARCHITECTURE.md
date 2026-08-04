@@ -3,7 +3,7 @@
 Status: this document describes the target production architecture and
 the reasoning behind it. The code in this repo runs the full agent logic
 locally against an in-memory state store and a stubbed model client. The
-AWS resources below are captured as CloudFormation in `infra/template.yaml`
+AWS resources below are captured as CDK (TypeScript) in `infra-cdk/`
 but are **not provisioned** — see "What's actually deployed" at the bottom.
 
 ## The problem this is solving
@@ -128,12 +128,26 @@ discipline can fix after the fact.
 
 ## What's actually deployed
 
-Per project scope: this repository ships `infra/template.yaml` (AWS SAM /
-CloudFormation) describing the resources above — VPC, subnets, ECS
-cluster + Fargate task definitions, DynamoDB tables, S3 buckets, API
-Gateway, and the IAM roles/policies — as deployment-ready infrastructure
-as code. **Nothing in this document has been provisioned against a real
-AWS account as part of this project.** `sam deploy` / `aws cloudformation
-deploy` against `infra/template.yaml` is the next step for a team that
-wants to actually stand this up, and doing so will incur real AWS costs
-(NAT gateway and Fargate being the two line items worth watching first).
+Per project scope: this repository ships `infra-cdk/` (AWS CDK,
+TypeScript) describing the resources above — VPC, subnets, one ECS
+Fargate service running the orchestrator container, an internal ALB,
+DynamoDB tables, an S3 bucket, an API Gateway HTTP API with a VPC Link,
+one Lambda for the fulfillment webhook, and least-privilege IAM per
+resource — as deployment-ready infrastructure as code, with its own test
+suite (`infra-cdk/test/stacks.test.ts`) asserting the stack dependency
+graph stays one-directional (`Network`/`Data` → `Compute` → `Api`).
+**Nothing in this document has been provisioned against a real AWS
+account as part of this project.** `cdk deploy --all` against
+`infra-cdk/` is the next step for a team that wants to actually stand
+this up — see `infra-cdk/README.md` for the bootstrap/Docker
+prerequisites — and doing so will incur real AWS costs (NAT gateway and
+Fargate being the two line items worth watching first).
+
+One scope note worth repeating from `infra-cdk/README.md`: the Fargate
+service runs the orchestrator process as a single task. Summarizer,
+validator, enrichment, and fulfillment agents execute in-process inside
+it, the same as they do in this repo's tests — this stack does not spin
+up a separate Fargate task per agent. Per-agent compute isolation would
+require a queue between the orchestrator and each agent and an async
+rewrite of `dispatch()`; that's a future application-architecture change,
+not something this infra stack does today.

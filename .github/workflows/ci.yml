@@ -36,3 +36,22 @@ jobs:
         run: pip install ruff
       - name: Lint
         run: ruff check src tests
+
+  infra:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra-cdk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm install
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Unit tests (stack resources + dependency graph)
+        run: npx jest
+      - name: cdk synth (no AWS credentials needed)
+        run: npx cdk synth --all -c env=dev

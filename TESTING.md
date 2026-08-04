@@ -60,6 +60,18 @@ PYTHONPATH=. pytest tests/smoke -q     # post-deploy check
 `.github/workflows/ci.yml` runs pytest against Python 3.10 and 3.11 on
 every push and PR. See that file for the exact matrix.
 
+## Infrastructure tests
+
+`infra-cdk/test/stacks.test.ts` (jest) is a separate suite from the ones
+above -- it tests the CDK app, not the Python application. Two things
+worth knowing: `app.synth()` succeeding is itself the assertion that the
+four stacks (`Network`, `Data`, `Compute`, `Api`) don't have a circular
+dependency, and a second test explicitly locks the direction down
+(`Network`/`Data` never depend on `Compute`/`Api`) so a future change to
+the ALB/VPC-Link security group wiring can't silently reintroduce the
+cross-stack cycle this app almost shipped with. Run it from `infra-cdk/`
+with `npm test`.
+
 ## Known gaps (cut for time, not hidden)
 
 - No load/soak test against a real Bedrock/Anthropic endpoint yet - the
