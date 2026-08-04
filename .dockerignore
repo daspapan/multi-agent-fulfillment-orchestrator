@@ -1,0 +1,11 @@
+.git
+.github
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+tests
+infra-cdk/node_modules
+infra-cdk/cdk.out
+content
+docs

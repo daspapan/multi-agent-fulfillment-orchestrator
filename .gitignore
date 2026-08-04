@@ -19,4 +19,12 @@ content/
 content_hide
 course/
 course-from-scratch/
-infra_old/
+infra-cdk/cdk.out/
+infra-cdk/*.js
+infra-cdk/*.d.ts
+infra-cdk/lib/*.js
+infra-cdk/lib/*.d.ts
+infra-cdk/bin/*.js
+infra-cdk/bin/*.d.ts
+infra-cdk/test/*.js
+infra-cdk/test/*.d.ts
